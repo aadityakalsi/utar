@@ -69,13 +69,15 @@ conan_define_targets()
 msg("Conan targets: ${CONAN_TARGETS}")
 target_link_libraries(utar PRIVATE ${CONAN_TARGETS})
 
-target_compile_features(
-  utar
-  PUBLIC
-  cxx_nullptr
-  cxx_lambdas
-  cxx_auto_type
-  cxx_static_assert)
+#target_compile_features(
+#  utar
+#  PUBLIC
+#  cxx_nullptr
+#  cxx_lambdas
+#  cxx_auto_type
+#  cxx_static_assert)
+
+set(CMAKE_CXX_STANDARD 11)
 
 configure_file(
   cmake/utarConfig.cmake.in
