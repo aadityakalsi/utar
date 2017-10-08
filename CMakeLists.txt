@@ -43,6 +43,11 @@ else()
   set(build_flag UTAR_STATIC)
 endif()
 
+if (BUILD_SHARED_LIBS)
+  set_target_properties(utar PROPERTIES VERSION ${ver_string}
+                                      SOVERSION ${ver_maj})
+endif()
+
 target_compile_definitions(
   utar
   PRIVATE
@@ -59,15 +64,16 @@ target_include_directories(
          $<INSTALL_INTERFACE:include>)
 
 # 3P deps
-if (EXISTS ${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-  include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-else()
-  message(FATAL "Conan build info not found!")
-endif()
+set(3p ZLIB::zlib BZip2::bz2)
 
-conan_define_targets()
-msg("Conan targets: ${CONAN_TARGETS}")
-target_link_libraries(utar PRIVATE ${CONAN_TARGETS})
+foreach(pkg ${3p})
+  string(REPLACE ":" ";" _pkg_name ${pkg})
+  list(GET _pkg_name 0 _pkg_name)
+  find_package(${_pkg_name} CONFIG)
+  msg("Finding ${_pkg_name}...")
+endforeach()
+
+target_link_libraries(utar PRIVATE ${3p})
 
 #target_compile_features(
 #  utar
@@ -100,19 +106,6 @@ install(
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin
   INCLUDES DESTINATION include)
-
-macro(install_dep dep)
-  get_target_property(_dep_loc ${dep} INTERFACE_LINK_LIBRARIES)
-  list(GET _dep_loc 0 _dep_loc)
-  # msg("${_dep_loc}")
-  install(
-    FILES ${_dep_loc}
-    DESTINATION lib)
-endmacro(install_dep)
-
-foreach(dep ${CONAN_TARGETS})
-  install_dep(${dep})
-endforeach()
 
 # install(
 #   TARGETS CONAN_PKG::zlib
