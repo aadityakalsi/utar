@@ -1,0 +1,23 @@
+# utarConfig.cmake
+
+# - Config file for the utar package
+# It defines the following variables
+#  UTAR_INCLUDE_DIRS - include directories for utar
+#  UTAR_LIBRARIES    - libraries to link against
+#  UTAR_EXECUTABLE   - executable if any
+
+# Compute paths
+get_filename_component(UTAR_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+set(UTAR_INCLUDE_DIRS include)
+
+# Our library dependencies (contains definitions for IMPORTED targets)
+if(NOT TARGET utar AND NOT UTAR_BINARY_DIR)
+  include("${UTAR_CMAKE_DIR}/utarTargets.cmake")
+endif()
+
+# These are IMPORTED targets created by utarTargets.cmake
+set(UTAR_LIBRARIES utar)
+set(UTAR_EXECUTABLE )
+
+# find_package(ZLIB REQUIRED)
+# find_package(BZip2 REQUIRED)
