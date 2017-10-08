@@ -15,7 +15,7 @@
 #    define _CRT_SECURE_NO_WARNINGS
 #  endif
 #else
-#  ifdef BUILDING_UTAR
+#  ifdef BUILDING_UTAR_SHARED
 #    define UTAR_API __attribute__ ((visibility ("default")))
 #  else
 #    define UTAR_API 

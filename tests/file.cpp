@@ -2,8 +2,10 @@
 
 #include "defs.h"
 
-#include "utar/file.hpp"
+#include <utar/version.hpp>
+#include <utar/file.hpp>
 
+#include <stdio.h>
 #include <string.h>
 
 void fCreateOpenReadWrite()
@@ -26,4 +28,14 @@ void fCreateOpenReadWrite()
 setupSuite(file)
 {
     addTest(fCreateOpenReadWrite);
+}
+
+void verPrint()
+{
+    ::printf("%s\n", utar::version());
+}
+
+setupSuite(version)
+{
+    addTest(verPrint);
 }
