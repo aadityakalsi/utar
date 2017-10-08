@@ -1,3 +1,3 @@
 /*! suites.h */
 
-runSuite(exports);
+runSuite(file);

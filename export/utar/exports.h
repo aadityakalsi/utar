@@ -3,8 +3,10 @@
 #ifndef _UTAR_VERSION_H_
 #define _UTAR_VERSION_H_
 
-#if defined(_WIN32) && !defined(__GCC__)
-#  ifdef BUILDING_UTAR
+#if defined(UTAR_STATIC)
+#  define UTAR_API
+#elif defined(_WIN32) && !defined(__GCC__)
+#  ifdef BUILDING_UTAR_SHARED
 #    define UTAR_API __declspec(dllexport)
 #  else
 #    define UTAR_API __declspec(dllimport)
@@ -27,5 +29,9 @@
 #  define UTAR_EXTERN_C
 #  define UTAR_C_API UTAR_API
 #endif
+
+#include <stddef.h>
+#include <ctype.h>
+#include <stdint.h>
 
 #endif/*_UTAR_VERSION_H_*/
