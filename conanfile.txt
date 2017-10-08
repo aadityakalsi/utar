@@ -14,3 +14,6 @@ bzip2:shared=True
 #lib, *.dylib -> ./lib
 #lib, *.so -> ./lib
 #lib, *.a -> ./lib
+
+[imports]
+., license* -> ./licenses @ folder=True, ignore_case=True
