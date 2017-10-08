@@ -12,6 +12,8 @@ find_package(utar)
 
 file(GLOB src_files ${src_dir}/*.c ${src_dir}/*.cpp)
 
+set(CMAKE_CXX_STANDARD 11)
+
 add_executable(tests_install ${src_files})
 
 target_include_directories(
