@@ -6,7 +6,6 @@ root=`dirname $exec`
 set -e
 mkdir -p $root/_build
 
-#cd $root/_build && conan install .. && cd -
 install_path=${CMAKE_INSTALL_PREFIX:-$root/_install}
 cmake_config=${CMAKE_CONFIG:-RelWithDebInfo}
 

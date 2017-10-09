@@ -15,9 +15,11 @@
 #  define _UTAR_INVALID_FILE_ -1
 #endif
 
+#include "utar/error.hpp"
+
 #include <cassert>
-#include <errno.h>
 #include <limits.h>
+
 
 namespace utar {
 
@@ -87,7 +89,7 @@ error_code file::create(file_mode mode, path_type utf8_path)
     get_mode_advice(mode, flags, advice);
     fd_ = ::CreateFileW(utf16_filename(utf8_path), flags, 0, NULL, CREATE_NEW, advice, NULL);
     if (fd_ == INVALID) {
-        return errno;
+        return errno_error();
     }
     return 0;
 }
@@ -99,7 +101,7 @@ error_code file::open(file_mode mode, path_type utf8_path)
     get_mode_advice(mode, flags, advice);
     fd_ = ::CreateFileW(utf16_filename(utf8_path), flags, 0, NULL, OPEN_EXISTING, advice, NULL);
     if (fd_ == INVALID) {
-        return errno;
+        return errno_error();
     }
     return 0;
 }
@@ -107,7 +109,7 @@ error_code file::open(file_mode mode, path_type utf8_path)
 error_code file::erase(path_type utf8_path)
 {
     if (!::DeleteFileW(utf16_filename(utf8_path))) {
-        return errno;
+        return errno_error();
     }
     return 0;
 }
@@ -117,7 +119,7 @@ error_code file::size(file_size& size)
     assert(is_open());
     LARGE_INTEGER file_size;
     if (!::GetFileSizeEx(fd_, &file_size)) {
-        return errno;
+        return errno_error();
     }
     size = file_size.QuadPart;
     return 0;
@@ -136,10 +138,12 @@ error_code file::read(file_off off, void* buff, size_t bytes)
         ov.hEvent = NULL;
 
         if (!::ReadFile(fd_, buff, bytes_to_int(bytes), &amt, &ov)) {
-            return errno;
+            return errno_error();
         }
 
-        assert(amt > 0);
+        if (amt == 0) {
+            return short_read;
+        }
 
         off += amt;
         bytes -= amt;
@@ -161,10 +165,12 @@ error_code file::write(file_off off, void const* buff, size_t bytes)
         ov.hEvent = NULL;
 
         if (!::WriteFile(fd_, buff, bytes_to_int(bytes), &amt, &ov)) {
-            return errno;
+            return errno_error();
         }
 
-        assert(amt > 0);
+        if (amt == 0) {
+            return short_write;
+        }
 
         off += amt;
         bytes -= amt;
@@ -178,7 +184,7 @@ error_code file::trunc(file_size size)
     LARGE_INTEGER off;
     off.QuadPart = size;
     if (!::SetFilePointerEx(fd_, off, NULL, FILE_BEGIN) || !::SetEndOfFile(fd_)) {
-        return errno;
+        return errno_error();
     }
     return 0;
 }
@@ -234,11 +240,11 @@ error_code file::create(file_mode mode, path_type utf8_path)
     get_mode_advice(mode, flags, advice);
     fd_ = ::open(utf8_path, flags | O_CREAT | O_EXCL, 0644);
     if (fd_ == INVALID) {
-        return errno;
+        return errno_error();
     }
 #ifndef __APPLE__
     if (::posix_fadvise(fd_, 0, 0, advice) != 0) {
-        return errno;
+        return errno_error();
     }
 #endif
 }
@@ -250,18 +256,18 @@ error_code file::open(file_mode mode, path_type utf8_path)
     get_mode_advice(mode, flags, advice);
     fd_ = ::open(utf8_path, flags, 0644);
     if (fd_ == INVALID) {
-        return errno;
+        return errno_error();
     }
 #ifndef __APPLE__
     if (::posix_fadvise(fd_, 0, 0, advice) != 0) {
-        return errno;
+        return errno_error();
     }
 #endif
 }
 
 error_code file::erase(path_type utf8_path)
 {
-    return ::unlink(utf8_path) ? errno : 0;
+    return ::unlink(utf8_path) ? errno_error() : 0;
 }
 
 error_code file::size(file_size& sz)
@@ -269,7 +275,7 @@ error_code file::size(file_size& sz)
     static_assert(sizeof(stat::st_size) == sizeof(file_size), "");
     struct stat st;
     if (::fstat(fd_, &st) != 0) {
-        return errno;
+        return errno_error();
     }
     sz = st.st_size;
     return 0;
@@ -284,8 +290,10 @@ error_code file::read(file_off off, void* buff, size_t bytes)
             if (errno == EINTR) {
                 continue;
             } else {
-                return errno;
+                return errno_error();
             }
+        } else if (amt == 0) {
+            return short_read;
         }
         assert(amt > 0);
         off += amt;
@@ -303,8 +311,10 @@ error_code file::write(file_off off, void const* buff, size_t bytes)
             if (errno == EINTR) {
                 continue;
             } else {
-                return errno;
+                return errno_error();
             }
+        } else if (amt == 0) {
+            return short_write;
         }
         off += amt;
         bytes -= amt;
@@ -322,7 +332,7 @@ error_code file::trunc(file_size size)
         } else if (errno == EINTR) {
             continue;
         } else {
-            err = errno;
+            err = errno_error();
             break;
         }
     }

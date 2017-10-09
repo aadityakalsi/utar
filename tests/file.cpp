@@ -5,8 +5,10 @@
 #include <utar/version.hpp>
 #include <utar/file.hpp>
 
+#include <errno.h>
 #include <stdio.h>
 #include <string.h>
+
 
 void fCreateOpenReadWrite()
 {
@@ -33,10 +35,17 @@ setupSuite(file)
 
 void verPrint()
 {
-    ::printf("%s\n", utar::version());
+    ::printf("%s: ", utar::version());
+}
+
+void errStr()
+{
+    ::printf("%s: ", utar::error_msg(1));
+    ::printf("%s: ", utar::error_msg(-ENOMEM));
 }
 
 setupSuite(version)
 {
     addTest(verPrint);
+    addTest(errStr);
 }

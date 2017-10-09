@@ -24,6 +24,8 @@ else()
   set(DLL_DIR ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE})
 endif(UNIX)
 
+set(CMAKE_CXX_STANDARD 11)
+
 macro(msg m)
   message("## [utar] ${m}")
 endmacro(msg)
@@ -94,8 +96,6 @@ target_link_libraries(utar PRIVATE ${3p})
 #  cxx_lambdas
 #  cxx_auto_type
 #  cxx_static_assert)
-
-set(CMAKE_CXX_STANDARD 11)
 
 configure_file(
   cmake/utarConfig.cmake.in
