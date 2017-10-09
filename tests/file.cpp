@@ -22,6 +22,7 @@ void fCreateOpenReadWrite()
     testThat(f.read(0, buf, 3) == 0);
     buf[3] = '\0';
     testThat(::strcmp(buf, "foo") == 0);
+    f.close();
     testThat(utar::file::erase("foo.test") == 0);
 }
 

@@ -22,7 +22,13 @@ target_include_directories(
 
 target_link_libraries(tests_install utar)
 
+if (WIN32)
+  set(cmd_env ${CMAKE_COMMAND} -E env PATH="\$PATH$<SEMICOLON>${CMAKE_INSTALL_PREFIX}/bin" $<TARGET_FILE:tests_install>)
+else()
+  set(cmd_env $<TARGET_FILE:tests_install>)
+endif()
+
 add_custom_target(
   tests_run
-  COMMAND tests_install
+  COMMAND ${cmd_env}
   DEPENDS tests_install)

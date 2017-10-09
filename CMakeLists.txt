@@ -20,6 +20,8 @@ if (UNIX)
   else()
     set(CMAKE_INSTALL_RPATH "\$ORIGIN/../lib")
   endif()
+else()
+  set(DLL_DIR ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE})
 endif(UNIX)
 
 macro(msg m)
@@ -71,6 +73,16 @@ foreach(pkg ${3p})
   list(GET _pkg_name 0 _pkg_name)
   find_package(${_pkg_name} CONFIG)
   msg("Finding ${_pkg_name}...")
+  get_target_property(_loc ${pkg} LOCATION)
+  msg("  ${pkg} -> ${_loc}")
+  if (WIN32)
+    if (BUILD_SHARED_LIBS)
+      # get_target_property(_dll_dir utar LOCATION)
+      # get_filename_component(_dll_dir ${_dll_dir} DIRECTORY)
+      # msg("  utar dir: ${RUNTIME_OUTPUT_DIRECTORY}")
+      file(COPY ${_loc} DESTINATION ${DLL_DIR})
+    endif()
+  endif()
 endforeach()
 
 target_link_libraries(utar PRIVATE ${3p})
@@ -106,20 +118,6 @@ install(
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin
   INCLUDES DESTINATION include)
-
-# install(
-#   TARGETS CONAN_PKG::zlib
-#   ARCHIVE DESTINATION lib
-#   LIBRARY DESTINATION lib
-#   RUNTIME DESTINATION bin
-#   INCLUDES DESTINATION include)
-
-# install(
-#   TARGETS CONAN_PKG::bzip2
-#   ARCHIVE DESTINATION lib
-#   LIBRARY DESTINATION lib
-#   RUNTIME DESTINATION bin
-#   INCLUDES DESTINATION include)
 
 install(
   DIRECTORY export/

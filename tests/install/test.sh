@@ -6,7 +6,14 @@ root=`dirname $parent`
 
 set -e
 
-cmake -H. -B$currdir/_build -DCMAKE_INSTALL_PREFIX=$root/_install -DTESTS_DIR=$root/tests
+if [ -z "$GENERATOR" ]; then
+    export GENERATOR_ARG=
+else
+    export GENERATOR_ARG="-G'$GENERATOR'"
+fi
+
+cmd="cmake -H. -B$currdir/_build ${GENERATOR_ARG} -DCMAKE_INSTALL_PREFIX=$root/_install -DTESTS_DIR=$root/tests"
+bash -c "$cmd"
 env VERBOSE=1 cmake --build $currdir/_build --target tests_run > $currdir/testLog.txt
 rm -fr $currdir/_build
 
