@@ -1,6 +1,6 @@
-/*! error.hpp */
+/*! error-int.hpp */
 
-#include <utar/types.hpp>
+#include <utar/error.hpp>
 
 #include <errno.h>
 

@@ -15,7 +15,7 @@
 #  define _UTAR_INVALID_FILE_ -1
 #endif
 
-#include "utar/error.hpp"
+#include "utar/error-int.hpp"
 
 #include <cassert>
 #include <limits.h>

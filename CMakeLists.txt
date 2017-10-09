@@ -79,9 +79,7 @@ foreach(pkg ${3p})
   msg("  ${pkg} -> ${_loc}")
   if (WIN32)
     if (BUILD_SHARED_LIBS)
-      # get_target_property(_dll_dir utar LOCATION)
-      # get_filename_component(_dll_dir ${_dll_dir} DIRECTORY)
-      # msg("  utar dir: ${RUNTIME_OUTPUT_DIRECTORY}")
+      # copy DLLs on Windows to the DLL dir for the project's build
       file(COPY ${_loc} DESTINATION ${DLL_DIR})
     endif()
   endif()
@@ -139,6 +137,11 @@ install(
   FILES ${PROJECT_SOURCE_DIR}/LICENSE
   DESTINATION share/utar
   RENAME LICENSE.utar)
+
+if (WIN32)
+  include(InstallRequiredSystemLibraries)
+  install(FILES ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS} DESTINATION bin)
+endif()
 
 # TESTS
 

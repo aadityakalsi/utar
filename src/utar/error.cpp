@@ -1,6 +1,6 @@
 /*! error.cpp */
 
-#include <utar/error.hpp>
+#include <utar/error-int.hpp>
 
 #include <string.h>
 
