@@ -43,8 +43,10 @@ add_library(utar ${src_files})
 
 if (BUILD_SHARED_LIBS)
   set(build_flag BUILDING_UTAR_SHARED)
+  set(pub_build_flag )
 else()
-  set(build_flag UTAR_STATIC)
+  set(build_flag )
+  set(pub_build_flag UTAR_STATIC)
 endif()
 
 if (BUILD_SHARED_LIBS)
@@ -54,6 +56,8 @@ endif()
 
 target_compile_definitions(
   utar
+  PUBLIC
+    ${pub_build_flag}
   PRIVATE
     ${build_flag}
     UTAR_VER_MAJ=${ver_maj}
