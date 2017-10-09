@@ -139,7 +139,8 @@ install(
 
 install(
   FILES ${PROJECT_SOURCE_DIR}/LICENSE
-  DESTINATION share/utar)
+  DESTINATION share/utar
+  RENAME LICENSE.utar)
 
 # TESTS
 
